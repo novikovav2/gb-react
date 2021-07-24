@@ -1,24 +1,20 @@
-import {useState} from "react";
 import {ListItem, List, ListItemText, ListItemAvatar, Avatar, Paper, makeStyles, Typography} from '@material-ui/core';
 import ImageIcon from '@material-ui/icons/Image';
+import {Link} from "react-router-dom";
 
 const useStyles = makeStyles({
     root: {
         minWidth: "30%",
         height: "100vh"
+    },
+    link: {
+        textDecoration: "none"
     }
 })
 
-export default function ChatsList() {
+export default function ChatsList(props) {
     const classes = useStyles();
-    const defaultChatsListValue = [
-        {name: 'Robot', id: 'robot'},
-        {name: 'Vasya', id: 'vasya'},
-        {name: 'Lesha', id: 'lesha'},
-        {name: 'Petya', id: 'patya'}
-    ]
 
-    const [chatList] = useState(defaultChatsListValue)
 
     return (
         <Paper elevation={10} className={classes.root}>
@@ -26,17 +22,18 @@ export default function ChatsList() {
                 Ваши контакты
             </Typography>
             {
-                chatList.map((chat) =>
+                props.chatList.map((chat) =>
                     <List key={chat.id}>
-                        <ListItem>
-                            <ListItemAvatar>
-                                <Avatar>
-                                    <ImageIcon />
-                                </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText primary={chat.name}
-                                          secondary={chat.id}/>
-                        </ListItem>
+                        <Link to={'/chats/' + chat.id} className={classes.link}>
+                            <ListItem selected={props.chatId === chat.id}>
+                                <ListItemAvatar>
+                                    <Avatar>
+                                        <ImageIcon />
+                                    </Avatar>
+                                </ListItemAvatar>
+                                <ListItemText primary={chat.name}/>
+                            </ListItem>
+                        </Link>
                     </List>
                 )
             }
