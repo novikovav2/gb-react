@@ -23,7 +23,7 @@ const useStyles = makeStyles({
     }
 })
 
-export default function Chat() {
+export default function Chat(props) {
     const classes = useStyles();
     const [messageList, setMessageList] = useState([]);
     const [id, setId] = useState(1) // Хардкодинг, имитирующий увеличение ID у сообщений
@@ -48,9 +48,9 @@ export default function Chat() {
 
 
     const robotAnswer = () => {
-        if (messageList.length > 0 && messageList[messageList.length - 1].author !== 'Robot') {
+        if (messageList.length > 0 && messageList[messageList.length - 1].author !== props.currentChat.name) {
             const robotMessage = 'Напечатай еще что-нибудь...'
-            setTimeout(() => addMessage(robotMessage, 'Robot'), 1500)
+            setTimeout(() => addMessage(robotMessage, props.currentChat.name), 1500)
         }
     }
 
@@ -64,7 +64,14 @@ export default function Chat() {
         setCurrentMessage('')
     }
 
-    useEffect(robotAnswer, [messageList, addMessage])
+    // Очищаем список сообщениий при переходе к другому пользователю
+    useEffect(() => {
+        return () => {
+            setMessageList([])
+        };
+    }, [props.currentChat.name]);
+
+    useEffect(robotAnswer, [messageList, addMessage, props.currentChat])
 
     // Делаем скроллинг области, в которую выводим сообщения и возвращаем фокус на поле ввода
     useEffect(() => {
@@ -75,7 +82,7 @@ export default function Chat() {
     return (
         <Paper className={classes.root}>
             <Typography variant="h5" >
-                Название чата
+                {props.currentChat.name}
             </Typography>
             <Box className={classes.chatContainer} ref={messageContainerRef}>
                 <Grid container direction="column" >
