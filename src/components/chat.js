@@ -5,7 +5,7 @@ import TextField from "@material-ui/core/TextField";
 import SendIcon from "@material-ui/icons/Send";
 import {useDispatch, useSelector} from "react-redux";
 import {getMessagesByChatId} from "../redux/messages/selectors";
-import {addMessageToStore} from "../redux/messages/messages-actions";
+import {addMessageWithThunk} from "../redux/messages/messages-actions";
 
 const useStyles = makeStyles({
     root: {
@@ -42,17 +42,9 @@ export default function Chat(props) {
             currentUser: currentUserFlag,
             text: text
         }
-        dispatch(addMessageToStore(msg))
+        dispatch(addMessageWithThunk(msg))
     }, [props.currentChat, dispatch]);
 
-
-    const robotAnswer = () => {
-        console.log("In robotAnswer")
-        if (messageListFromStore.length > 0 && messageListFromStore[messageListFromStore.length - 1].currentUser) {
-            const robotMessage = 'Напечатай еще что-нибудь...'
-            setTimeout(() => addMessage(robotMessage, false), 1500)
-        }
-    }
 
     const handleInputChange = (event) => {
         setCurrentMessage(event.target.value)
@@ -64,7 +56,6 @@ export default function Chat(props) {
         setCurrentMessage('')
     }
 
-    useEffect(robotAnswer, [messageListFromStore, addMessage])
 
     // Делаем скроллинг области, в которую выводим сообщения и возвращаем фокус на поле ввода
     useEffect(() => {
