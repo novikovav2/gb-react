@@ -1,8 +1,11 @@
 import Message from "./message";
-import {useCallback, useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {Box, FormControl, Grid, IconButton, makeStyles, Paper, Typography} from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import SendIcon from "@material-ui/icons/Send";
+import {useDispatch, useSelector} from "react-redux";
+import {getMessagesByChatId} from "../redux/messages/selectors";
+import {addMessageToStore} from "../redux/messages/messages-actions";
 
 const useStyles = makeStyles({
     root: {
@@ -25,32 +28,29 @@ const useStyles = makeStyles({
 
 export default function Chat(props) {
     const classes = useStyles();
-    const [messageList, setMessageList] = useState([]);
-    const [id, setId] = useState(1) // Хардкодинг, имитирующий увеличение ID у сообщений
-    const [currentUser] = useState('Ivanov Ivan')
+    const getSelectedMessages = useMemo(() => getMessagesByChatId(props.currentChat.id), [props.currentChat.id])
+    const messageListFromStore = useSelector(getSelectedMessages)
+    const dispatch = useDispatch()
     const messageContainerRef = useRef(null);
     const inputRef = useRef(null);
     const [currentMessage, setCurrentMessage] = useState('')
 
-    const addMessage = useCallback((text, author) => {
+    const addMessage = useCallback((text, currentUserFlag) => {
         const msg = {
-            id: id,
-            author: author,
+            id: +Date.now(),
+            chatId: +props.currentChat.id,
+            currentUser: currentUserFlag,
             text: text
         }
-
-        setMessageList((prevMessageList) => {
-            return prevMessageList.concat(msg);
-        });
-
-        setId((oldId) => oldId + 1); // Хардкодинг, для увеличения id сообщений
-    }, [id]);
+        dispatch(addMessageToStore(msg))
+    }, [props.currentChat, dispatch]);
 
 
     const robotAnswer = () => {
-        if (messageList.length > 0 && messageList[messageList.length - 1].author !== props.currentChat.name) {
+        console.log("In robotAnswer")
+        if (messageListFromStore.length > 0 && messageListFromStore[messageListFromStore.length - 1].currentUser) {
             const robotMessage = 'Напечатай еще что-нибудь...'
-            setTimeout(() => addMessage(robotMessage, props.currentChat.name), 1500)
+            setTimeout(() => addMessage(robotMessage, false), 1500)
         }
     }
 
@@ -60,43 +60,35 @@ export default function Chat(props) {
 
     const handleSubmitForm = (event) => {
         event.preventDefault();
-        addMessage(currentMessage, currentUser)
+        addMessage(currentMessage, true)
         setCurrentMessage('')
     }
 
-    // Очищаем список сообщениий при переходе к другому пользователю
-    useEffect(() => {
-        return () => {
-            setMessageList([])
-        };
-    }, [props.currentChat.name]);
-
-    useEffect(robotAnswer, [messageList, addMessage, props.currentChat])
+    useEffect(robotAnswer, [messageListFromStore, addMessage])
 
     // Делаем скроллинг области, в которую выводим сообщения и возвращаем фокус на поле ввода
     useEffect(() => {
         messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
         inputRef.current.focus()
-    }, [messageList])
+    }, [messageListFromStore])
 
     return (
         <Paper className={classes.root}>
-            <Typography variant="h5" >
+            <Typography variant="h5">
                 {props.currentChat.name}
             </Typography>
             <Box className={classes.chatContainer} ref={messageContainerRef}>
-                <Grid container direction="column" >
+                <Grid container direction="column">
                     {
-                        messageList.map((message) =>
+                        messageListFromStore.map((message) =>
                             <Message key={message.id}
                                      text={message.text}
-                                     author={message.author}
-                                     fromCurrentUser={message.author === currentUser} />)
+                                     fromCurrentUser={message.currentUser}/>)
                     }
                 </Grid>
             </Box>
 
-            <form onSubmit={handleSubmitForm} >
+            <form onSubmit={handleSubmitForm}>
                 <FormControl className={classes.input}>
                     <TextField label="Ваше сообщение"
                                id='text-field'

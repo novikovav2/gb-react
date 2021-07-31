@@ -21,9 +21,9 @@ export default function Message(props) {
     return (
         <Card className={props.fromCurrentUser ? classes.right : classes.left}>
             <CardContent>
-                <Typography variant="h6" component="p">
-                    {props.fromCurrentUser ? 'Вы' :props.author}
-                </Typography>
+                {/*<Typography variant="h6" component="p">*/}
+                {/*    {props.fromCurrentUser ? 'Вы' : props.author}*/}
+                {/*</Typography>*/}
                 <Typography variant="body1" component="p">
                     {props.text}
                 </Typography>
