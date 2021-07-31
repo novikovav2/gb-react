@@ -2,7 +2,7 @@ import React from "react";
 import {Checkbox, Divider, FormControl, FormControlLabel, FormGroup, Paper, Typography} from "@material-ui/core";
 import {Link} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import {changeName, changeStatus} from "../redux/profile-actions";
+import {changeName, changeStatus} from "../redux/profile/profile-actions";
 import TextField from "@material-ui/core/TextField";
 
 export default function Profile() {
@@ -24,9 +24,9 @@ export default function Profile() {
             </Typography>
 
             <Link to='/'>На главную</Link>
-            <Divider />
+            <Divider/>
 
-            <FormGroup >
+            <FormGroup>
                 <FormControl>
                     <TextField label="Имя"
                                variant="outlined"

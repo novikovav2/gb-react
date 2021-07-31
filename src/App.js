@@ -2,7 +2,7 @@ import Chat from './components/chat'
 import ChatsList from "./components/chats-list";
 import {Box, createTheme, makeStyles, MuiThemeProvider} from "@material-ui/core";
 import {useParams} from "react-router";
-import {useState} from "react";
+import {useSelector} from "react-redux";
 
 const useStyles = makeStyles({
     App: {
@@ -21,30 +21,17 @@ function App() {
         }
     })
 
-    // const currentChat= () => {
-    //     return chatList.find((chat) => {
-    //         if (chat.id === chatId) return true
-    //     })
-    // }
-
-    const defaultChatsListValue = [
-        {name: 'Robot', id: '111'},
-        {name: 'Vasya', id: '222'},
-        {name: 'Lesha', id: '333'},
-        {name: 'Petya', id: '444'}
-    ]
-
-    const [chatList] = useState(defaultChatsListValue)
+    const chatList = useSelector(state => state.chats)
 
     const currentChat = chatList.find((chat) => {
-        return chat.id === chatId ? true : false
+        return chat.id === +chatId
     })
 
     return (
         <MuiThemeProvider theme={darkTheme}>
             <Box className={classes.App}>
-                <ChatsList chatId={chatId} chatList={chatList}/>
-                { currentChat && <Chat currentChat={currentChat}/> }
+                <ChatsList chatId={chatId}/>
+                {currentChat && <Chat currentChat={currentChat}/>}
             </Box>
         </MuiThemeProvider>
     )
