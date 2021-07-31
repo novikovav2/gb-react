@@ -7,3 +7,16 @@ export const addMessageToStore = (message) => ({
     }
 })
 
+export const addMessageWithThunk = (message) => (dispatch, getState) => {
+    dispatch(addMessageToStore(message))
+
+    if (message.currentUser) {
+        const messageFromRobot = {
+            id: +Date.now(),
+            chatId: message.chatId,
+            currentUser: false,
+            text: 'Это пишет тебе на самом деле не робот!'
+        }
+        setTimeout(() => dispatch(addMessageToStore(messageFromRobot)), 1500)
+    }
+}
