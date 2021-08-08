@@ -24,7 +24,7 @@ function App() {
     const chatList = useSelector(state => state.chats)
 
     const currentChat = chatList.find((chat) => {
-        return chat.id === +chatId
+        return chat.id === chatId
     })
 
     return (
